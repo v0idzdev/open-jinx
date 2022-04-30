@@ -9,3 +9,4 @@ A small disclaimer, most of the code in this repository has been copied, or at l
 Below, I've listed all of the tutorials that I used to create Jinx OS. 
 
 * **[Daedelus | Making an OS | YouTube](https://www.youtube.com/watch?v=MwPjvJ9ulSc)**
+* **[Poncho | OS Dev S2 | YouTube](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)**
