@@ -10,3 +10,4 @@ Below, I've listed all of the tutorials that I used to create Jinx OS.
 
 * **[Daedelus | Making an OS | YouTube](https://www.youtube.com/watch?v=MwPjvJ9ulSc)**
 * **[Poncho | OS Dev S2 | YouTube](https://www.youtube.com/playlist?list=PLxN4E629pPnJxCQCLy7E0SQY_zuumOVyZ)**
+* **[nanobyte | Building an OS | YouTube](https://www.youtube.com/watch?v=9t-SPC7Tczc&list=PLFjM7v6KGMpiH2G-kT781ByCNC_0pKpPN)**
