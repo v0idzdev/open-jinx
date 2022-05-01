@@ -7,7 +7,7 @@ I decided to start this project to learn how to make an OS. Hence, this software
 A small disclaimer, most of the code in this repository has been copied, or at least heavily influenced by, various tutorials. After all, I'm trying to learn the ropes as an operating system developer, and am a complete beginner to this area of software engineering.
 
 ## How Can I Use Jinx OS?
-At the moment, Jinx is very primitive and has, essentially, no features. When Jinx becomes somewhat featureful, I will add download links for ISO files. Nevertheless, you can run Jinx on Linux in a VM (I will use **QEMU** as an example) like this:
+At the moment, Jinx is just a minimal bootable OS skeleton. When Jinx becomes somewhat featureful, I will add download links for ISO files. Nevertheless, you can run Jinx on Linux in a VM (I will use **QEMU** as an example) like this:
 
 #### Clone the repository
 ```bash
@@ -28,8 +28,8 @@ sudo pacman -S qemu  # Arch, Manjaro, etc.
 
 #### Run Jinx OS
 ```bash
-chmod +x scripts/debug.sh 
-./scripts/debug.sh
+chmod +x scripts/run.sh 
+./scripts/run.sh
 ```
 
 ## References/Tutorials I Followed
