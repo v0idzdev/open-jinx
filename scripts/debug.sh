@@ -1,1 +1,0 @@
-bochs -f config/bochsrc.txt
