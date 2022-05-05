@@ -1,3 +1,5 @@
+![Jinx OS Logo](https://i.imgur.com/UmDPsfq.png)
+
 # Jinx OS
 Jinx is a basic operating system built from scratch.
 
