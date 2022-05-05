@@ -1,38 +1,25 @@
 # Jinx OS
 Jinx is a basic operating system built from scratch.
 
-## Why Did I Decide to Create an OS?
-I decided to start this project to learn how to make an OS. Hence, this software is **not** intended to be used by end users - at least, not unless it becomes stable and featureful enough for that to be possible.
+## Install
+You can run Jinx OS in Docker.
 
-A small disclaimer, most of the code in this repository has been copied, or at least heavily influenced by, various tutorials. After all, I'm trying to learn the ropes as an operating system developer, and am a complete beginner to this area of software engineering.
-
-## How Can I Use Jinx OS?
-At the moment, Jinx is just a minimal bootable OS skeleton. When Jinx becomes somewhat featureful, I will add download links for ISO files. Nevertheless, you can run Jinx on Linux in a VM (I will use **QEMU** as an example) like this:
-
-#### Clone the repository
-```bash
-git clone https://github.com/matthewflegg/open-jinx.git
-cd open-jinx                            
+### Windows
+```batch
+git pull https://github.com/matthewflegg/open-jinx.git
+cd open-jinx
+.\buildenv\run.bat
 ```
 
-#### Then, install QEMU:
+### Linux
 ```bash
-sudo apt install qemu  # Ubuntu, Debian, etc.
-```
-```bash
-sudo dnf in qemu  # Fedora, RHEL, etc.
-```
-```bash
-sudo pacman -S qemu  # Arch, Manjaro, etc.
+git pull https://github.com/matthewflegg/open-jinx.git
+cd open-jinx
+chmod +x ./buildenv/run.sh
+sudo ./run.sh
 ```
 
-#### Run Jinx OS
-```bash
-chmod +x scripts/run.sh 
-./scripts/run.sh
-```
-
-## References/Tutorials I Followed
+## References
 Below, I've listed all of the tutorials that I used to create Jinx OS. 
 
 * **[Daedelus | Making an OS | YouTube](https://www.youtube.com/watch?v=MwPjvJ9ulSc)**
