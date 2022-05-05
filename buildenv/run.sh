@@ -1,1 +1,1 @@
-docker run --rm -it -v $pwd:/root/env jinx-buildenv
+docker run --rm -it -v $(pwd):/root/env jinx-buildenv
