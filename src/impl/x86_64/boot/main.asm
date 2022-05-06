@@ -68,10 +68,10 @@ CHECK_LONG_MODE:
 ; Sets up page tables
 SETUP_PAGE_TABLES:
     MOV        EAX, PAGE_TABLE_L3
-    OR         EAX, 0B11                                         ; Present/writable
+    OR         EAX, 0b11                                         ; Present/writable
     MOV        [PAGE_TABLE_L4], EAX
     MOV        EAX, PAGE_TABLE_L2
-    OR         EAX, 0B11
+    OR         EAX, 0b11
     MOV        [PAGE_TABLE_L3], EAX
     MOV        ECX, 0                                            ; Counter
 .LOOP:                                                           ; For loop
@@ -134,7 +134,7 @@ STACK_TOP:
 ; Global descriptor table
 SECTION       .RODATA
 GDT64:
-    DQ     0 
+    DQ         0 
 .CODE_SEGMENT: EQU $ - GDT64
     DQ         (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53)    ; Code segment
 .POINTER:
