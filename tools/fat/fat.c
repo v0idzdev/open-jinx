@@ -12,10 +12,6 @@ typedef uint8_t bool;
 #define true 1
 #define false 0
 
-bool ReadBootSector(FILE* disk);
-bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut);
-bool ReadAllocationTable(FILE* disk);
-
 /*
  * Struct: BootSector
  * ------------------
@@ -57,7 +53,7 @@ typedef struct {
  * This structure contains all of the fields for a directory entry that are
  * present in the FAT specifiecation
  */
-struct {
+typedef struct {
     uint8_t name[11];
     uint8_t attributes;
     uint8_t _reserved;
@@ -73,8 +69,17 @@ struct {
 
 } __attribute__((packed)) DirectoryEntry;
 
+// Function declarations
+bool ReadBootSector(FILE* disk);
+bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut);
+bool ReadFAT(FILE* disk);
+bool ReadRootDirectory(FILE* disk);
+DirectoryEntry* ReadFile(const char* name);
+
+// Global variables
 BootSector g_BootSector;  // This will contain a FAT12 header and EBR
-uint8_t g_Fat = NULL;     // This will contain the disk's allocation table
+uint8_t* g_Fat = NULL;    // This will contain the disk's allocation table
+DirectoryEntry* g_RootDirectory = NULL;
 
 /*
  * Function: main
@@ -106,13 +111,23 @@ int main(int argc, char** argv) {
         return -2;
     }
 
-    if (!ReadAllocationTable(disk)) {
+    // The same behaviour as descibed above also applies to the conditional
+    // statements written below
+    if (!ReadFAT(disk)) {
         fprintf(stderr, "Could not read file allocation table.\n");
         free(g_Fat);
         return -3;
     }
 
+    if (!ReadRootDirectory(disk)) {
+        fprintf(stderr, "Could not read file allocation table.\n");
+        free(g_Fat);
+        free(g_RootDirectory);
+        return -4;
+    }
+
     free(g_Fat);
+    free(g_RootDirectory);
     return 0;
 }
 
@@ -160,8 +175,8 @@ bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut) {
 }
 
 /*
- * Function: ReadAllocationTable
- * -----------------------------
+ * Function: ReadFAT
+ * -----------------
  *
  * \brief This function attempts to read a disk's FAT allocation table into
  * memory
@@ -171,7 +186,7 @@ bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut) {
  * @returns    This function returns a boolean value indicating the operation's
  *             success
  */
-bool ReadAllocationTable(FILE* disk) {
+bool ReadFAT(FILE* disk) {
     g_Fat = (uint8_t*)
         malloc(g_BootSector.sectorsPerFat * g_BootSector.bytesPerSector);
 
@@ -179,4 +194,47 @@ bool ReadAllocationTable(FILE* disk) {
     // to read the disk's file allocation table
     return ReadDiskSectors(disk, g_BootSector.reservedSectors,
         g_BootSector.sectorsPerFat, g_Fat);
+}
+
+/*
+ * Function: ReadRootDirectory
+ * ---------------------------
+ *
+ * \brief This function attempts to read the root directory of the disk's file
+ * system
+ *
+ * @param disk This should be the disk from which the allocation table will
+ *             be read
+ * @returns    This function returns a boolean value indicating the operation's
+ *             success
+ */
+bool ReadRootDirectory(FILE* disk) {
+    // LBA is the sum of the sizes of the previous two regions
+    //
+    // LBA refers the the logical block address
+    uint32_t lba = g_BootSector.reservedSectors + g_BootSector.sectorsPerFat
+        * g_BootSector.fatCount;
+
+    uint32_t size = sizeof(DirectoryEntry) * g_BootSector.dirEntryCount;
+    uint32_t sectors = (size / g_BootSector.bytesPerSector);
+
+    if (size % g_BootSector.bytesPerSector > 0)
+        sectors++;
+
+    // Allocate sufficient memory for the file system's root directory
+    g_RootDirectory = (DirectoryEntry*)malloc(sectors * g_BootSector.bytesPerSector);
+    return ReadDiskSectors(disk, lba, sectors, g_RootDirectory);
+}
+
+/*
+ * Function: ReadFile
+ * ------------------
+ *
+ * \brief This function attempts to read data from a specified file
+ *
+ * @param name This should be a string corresponding to the name of the file
+ * @returns    This function returns a pointer to the DirectoryEntry to read
+ *             from the specified disk
+ */
+DirectoryEntry* ReadFile(const char* name) {
 }
