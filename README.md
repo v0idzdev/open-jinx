@@ -21,6 +21,14 @@
 > ```bash
 > make build-x86_64
 > ```
+> Once Jinx OS has been built, you will be able to emulate it within a virtual machine. In
+> order to do this, it is recommended to use **QEMU**.
+>
+> Execute the following command within a bash terminal after exiting the Docker container
+> mentioned in the previous step:
+> ```bash
+> qemu-system-x86_64 -cdrom dist/x86_64/kernel.iso
+> ```
   
 
 ## References
