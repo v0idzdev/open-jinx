@@ -3,6 +3,7 @@
 ; long mode                                    ;
 ; -------------------------------------------- ;
 GLOBAL            LONG_MODE_START
+EXTERN            kernel_main
 SECTION          .TEXT
 BITS 64
 
@@ -15,5 +16,5 @@ LONG_MODE_START:
     MOV           GS, AX
 
     ; Print OK
-    MOV           DWORD [0xB8000], 0x2F4B22F4F
+    MOV           CALL kernel_main    ; main.c
     HLT
