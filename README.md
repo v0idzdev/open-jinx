@@ -11,9 +11,10 @@
 > Execute the following script within a **Bash** terminal:
 > ```bash
 > git clone https://github.com/matthewflegg/open-jinx.git && \
-> sudo docker build buildenv -t jinx-buildenv && \
-> chmod +x buildenv/run.sh && \
-> sudo ./buildenv/run.sh
+>   sudo service docker start && \
+>   sudo docker build buildenv -t jinx-buildenv && \
+>   chmod +x buildenv/run.sh && \
+>   sudo ./buildenv/run.sh
 > ```
 >
 > Within the **Docker container**, run in interactive mode, execute the following command:
