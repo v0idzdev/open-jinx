@@ -16,5 +16,5 @@ LONG_MODE_START:
     MOV           GS, AX
 
     ; Print OK
-    MOV           CALL kernel_main    ; main.c
+    CALL kernel_main                 ; main.c
     HLT
