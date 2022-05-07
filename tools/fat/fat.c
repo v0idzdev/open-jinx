@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /*
  * Struct: bool
@@ -77,11 +78,13 @@ bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut);
 bool ReadFAT(FILE* disk);
 bool ReadRootDirectory(FILE* disk);
 DirectoryEntry* FindFile(const char* name);
+bool ReadFile(DirectoryEntry* fileEntry, FILE* disk, uint8_t* outputBuffer);
 
 // Global variables
 BootSector g_BootSector;  // This will contain a FAT12 header and EBR
 uint8_t* g_Fat = NULL;    // This will contain the disk's allocation table
 DirectoryEntry* g_RootDirectory = NULL;
+uint32_t g_RootDirectoryEnd;
 
 /*
  * Function: main
@@ -136,6 +139,23 @@ int main(int argc, char** argv) {
         return -5;
     }
 
+    uint8_t* buffer = (uint8_t*)malloc(fileEntry->size + g_BootSector.bytesPerSector);
+    if (!ReadFile(fileEntry, disk, buffer)) {
+        fprintf(stderr, "Could not read file %s.\n", argv[2]);
+        free(g_Fat);
+        free(g_RootDirectory);
+        free(buffer);
+        return -5;
+    }
+
+    // The following code loops over each character in the file
+    // If it is printable, output it. Otherwise, output it's hexadecimal value
+    for (size_t i = 0; i < fileEntry->size; i++) {
+        if (isprint(buffer[i])) fputc(buffer[i], stdout);
+        else printf("<%02x>", buffer[i]);
+    }
+
+    printf("\n");
     free(g_Fat);
     free(g_RootDirectory);
     return 0;
@@ -232,15 +252,16 @@ bool ReadRootDirectory(FILE* disk) {
         sectors++;
 
     // Allocate sufficient memory for the file system's root directory
+    g_RootDirectoryEnd = lba + sectors;
     g_RootDirectory = (DirectoryEntry*)malloc(sectors * g_BootSector.bytesPerSector);
     return ReadDiskSectors(disk, lba, sectors, g_RootDirectory);
 }
 
 /*
- * Function: ReadFile
+ * Function: FindFile
  * ------------------
  *
- * \brief This function attempts to read data from a specified file
+ * \brief This function attempts to find a specified file
  *
  * @param name This should be a string corresponding to the name of the file
  * @returns    This function returns a pointer to the DirectoryEntry to read
@@ -256,4 +277,38 @@ DirectoryEntry* FindFile(const char* name) {
     }
 
     return NULL;
+}
+
+/*
+ * Function: ReadFile
+ * ------------------
+ *
+ * \brief This function attempts to read a DirectoryEntry and output it to
+ * a buffer
+ *
+ * @param fileEntry    This should be the DirectoryEntry to read
+ * @param disk         This should be the disk to read the file from
+ * @param outputBuffer This should be the buffer to write output to
+ * @returns            This function returns a boolean value indicating the
+ *                     operation's success
+ */
+bool ReadFile(DirectoryEntry* fileEntry, FILE* disk, uint8_t* outputBuffer) {
+    uint16_t currentCluster = fileEntry->firstClusterLow;
+    bool ok = true;
+
+    do {
+        uint32_t lba = g_RootDirectoryEnd + (currentCluster - 2) * g_BootSector.sectorsPerCluster;
+        ok = ok && ReadDiskSectors(disk, lba, g_BootSector.sectorsPerCluster, outputBuffer);
+        outputBuffer += g_BootSector.sectorsPerCluster * g_BootSector.bytesPerSector;
+
+        uint32_t fatIndex = currentCluster * 3 / 2;
+
+        if (currentCluster % 2 == 0)
+            currentCluster = (*(uint16_t*)(g_Fat + fatIndex)) && 0x0FFF;
+        else
+            currentCluster = (*(uint16_t*)(g_Fat + fatIndex)) >> 4;
+
+    } while (ok && currentCluster < 0x0FF8);
+
+    return ok;
 }
