@@ -74,7 +74,7 @@ bool ReadBootSector(FILE* disk);
 bool ReadDiskSectors(FILE* disk, uint8_t lba, uint32_t count, void* bufferOut);
 bool ReadFAT(FILE* disk);
 bool ReadRootDirectory(FILE* disk);
-DirectoryEntry* ReadFile(const char* name);
+DirectoryEntry* FindFile(const char* name);
 
 // Global variables
 BootSector g_BootSector;  // This will contain a FAT12 header and EBR
@@ -124,6 +124,14 @@ int main(int argc, char** argv) {
         free(g_Fat);
         free(g_RootDirectory);
         return -4;
+    }
+
+    DirectoryEntry* fileEntry = FindFile(argv[2]);
+    if (!fileEntry) {
+        fprintf(stderr, "Could not find file %s.\n", argv[2]);
+        free(g_Fat);
+        free(g_RootDirectory);
+        return -5;
     }
 
     free(g_Fat);
@@ -236,5 +244,14 @@ bool ReadRootDirectory(FILE* disk) {
  * @returns    This function returns a pointer to the DirectoryEntry to read
  *             from the specified disk
  */
-DirectoryEntry* ReadFile(const char* name) {
+DirectoryEntry* FindFile(const char* name) {
+    for (uint32_t i = 0; i < g_BootSector.dirEntryCount; i++) {
+
+        // If the name parameter is the same as the name passed in, return
+        // the memory address of the directory entry
+        if (memcmp(name, g_RootDirectory[i].name, 11) == 0)
+            return &g_RootDirectory[i];
+    }
+
+    return NULL;
 }
